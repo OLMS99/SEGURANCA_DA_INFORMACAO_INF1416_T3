@@ -2,8 +2,18 @@
 // Jam Ajna Soares - 2211689 
 // Olavo Lucas     - 1811181
 // -------------------------
-
+import java.io.*;
+import java.lang.*;
+import java.util.*;
+package MySignature;
+	
 public class MySignatureTest {
+	////if (isWindows) {
+	//		builder.command("cmd.exe", "/c", "dir");
+	//} else {
+	//		builder.command("sh", "-c", "ls");
+	//}
+	//ProcessBuilder talvez???
 	public static void main(String[] args){}
 	//receber o padrão de assinatura e a string que deve ser assinada, nesta ordem, como argumento na linha de comando
 	
