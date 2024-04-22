@@ -1,3 +1,8 @@
+// -------------------------
+// Jam Ajna Soares - 2211689 
+// Olavo Lucas     - 1811181
+// -------------------------
+
 public class MySignatureTest {
 	public static void main(String[] args){}
 	//receber o padrão de assinatura e a string que deve ser assinada, nesta ordem, como argumento na linha de comando
