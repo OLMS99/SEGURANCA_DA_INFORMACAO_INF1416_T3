@@ -31,17 +31,16 @@ public class MySignature
 		}
 		
 		MySignature signningProcess = MySignature.getInstance(signatureStandard);
-		//System.out.println( "Iniciando criptografia da mensagem:" );
-		// byte[] digest =  signningProcess.makeDigest(plainText)
-		//
-		//System.out.println( "criptografia da mensagem terminado" );
+		
+		System.out.println( "Iniciando criptografia da mensagem" );
+		byte[] digest =  signningProcess.makeDigest(plainText);
+		System.out.println( "criptografia da mensagem terminado" );
 
-		//System.out.println( "Iniciando criptografia do digest" );
-		//KeyPair chaves = signningProcess.keyGen.generateKeyPair()
-		//signningProcess.initSign(chaves.getPrivate())
-		//signningProcess.update(digest)
+		System.out.println( "Iniciando criptografia do digest" );
+		KeyPair chaves = signningProcess.keyGen.generateKeyPair();
+		//signningProcess.initSign(chaves.getPrivate());
+		//signningProcess.update(digest);
 		//byte[] assinatura = signningProcess.sign();
-		//
 		//System.out.println( "criptografia do digest terminado" );
 
 		//System.out.println( "Iniciando verificação da assinatura" );
@@ -66,12 +65,11 @@ public class MySignature
 		private static final MySignature SHA1withRSA = new MySignature("SHA1","RSA");
 		private static final MySignature SHA256ithRSA = new MySignature("SHA256","RSA");
 		private static final MySignature SHA512withRSA = new MySignature("SHA512","RSA");
-		private static final MySignature SHA256withECDSA = new MySignature("SHA256","ECDSA");
+		private static final MySignature SHA256withECDSA = new MySignature("SHA256","EdDSA");
 	}
 
 	private MySignature(String tipoDigest, String geChave)
 	{
-		
 		if (tipoDigest.equals("SHA1") || tipoDigest.equals("SHA256") || tipoDigest.equals("SHA512"))
 		{
 			this.cypherDigest = tipoDigest.substring(0, 3) + "-" + tipoDigest.substring(3);
@@ -81,19 +79,27 @@ public class MySignature
 		{
 			this.cypherDigest = tipoDigest;
 		}
-		
+
 		this.cypherSignature = geChave;
 		
 		try
 		{
-			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);
 			this.keyGen = KeyPairGenerator.getInstance(geChave);
 		}
-		catch(Exception e)
+		catch(NoSuchAlgorithmException e)
 		{
-			System.err.println("erro ao inicializar o objeto Mysignature");
+			System.err.println(geChave+" não é um algoritmo suportado");
 			System.exit(1);
 		}
+		
+		try{
+			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);
+		}
+		catch(NoSuchAlgorithmException e){
+			System.err.println(this.cypherDigest+" não é um algoritmo suportado");
+			System.exit(1);
+		}
+		
 	}
 	
 	public static MySignature getInstance(String padraoAssinatura)
@@ -116,10 +122,10 @@ public class MySignature
 				return SingletonHelper.SHA512withRSA;
 			case "SHA256withECDSA":
 				return SingletonHelper.SHA256withECDSA;
+			default:
+				System.err.println("Padrão de assinatura não suportado");
+				return null;
 		}
-		//Colocado por ocorrer erro do compilador: missing return statement
-		System.err.println("Padrão de assinatura não suportado");
-		return null;
 	}
 	
 	protected byte[] makeDigest(String text) {
@@ -148,8 +154,11 @@ public class MySignature
 		return result;
 	}
 
-	// initSign(keypair.getPrivate())
-	// update(text)
+	//protected  initSign(privateKey chavePrivada){}
+	//protected  update(String text){}
+	//protected  byte[] sign(){}
+	//protected  initVerify(publicKey chavePublica){}
+	//protected  verify(byte[] signature){}
 	// use to make the signature: Cipher +
 	//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(DigestTipo);
 	//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, messageHash);
