@@ -16,7 +16,7 @@ public class MySignature
 	public static void main(String[] args)
 	{
 		String signatureStandard = args[0];
-		String plainText = args[1];
+		byte[] plainText = args[1];
 
 		if (args.length !=2)
 		{
@@ -24,6 +24,14 @@ public class MySignature
 			System.exit(1);
 		}
 
+		System.out.println( "Iniciando criptografia da mensagem:" );
+		//System.out.println( "criptografia da mensagem terminado" );
+		//System.out.println( "Iniciando criptografia do digest" );
+		//System.out.println( "criptografia do digest terminado" );
+		//System.out.println( "Iniciando verificação da assinatura" );
+		//System.out.println( "verificação da assinatura terminada" );
+		//System.out.println("Digest:\n "+ HexCodeString(digest));
+		//System.out.println("Assinatura:\n "+ HexCodeString(digest));
 		MySignature signningProcess = MySignature.getInstance(signatureStandard);
 	}
 	
