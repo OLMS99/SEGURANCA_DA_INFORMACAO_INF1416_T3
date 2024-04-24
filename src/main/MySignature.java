@@ -13,6 +13,11 @@ import java.io.IOException;
 import java.security.*;
 import javax.crypto.*;
 
+//import bcprov-jdk15on-168.*;
+//import org.bouncycastle.asn1.x509.*;
+//import org.bouncycastle.operator.*;
+//import org.bouncycastle.crypto.*;
+
 public class MySignature
 {
 	private Boolean signning;
@@ -263,8 +268,12 @@ public class MySignature
 
 
 		System.out.println( "Iniciando criptografia do digest" );
-		
 		//adiciona sinal do algoritmo usado no inicio da array de bytes
+		//DigestAlgorithmIdentifierFinder hashAlgorithmFinder = new DefaultDigestAlgorithmIdentifierFinder();
+		//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.DigestTipo);
+		//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, digest);
+		//byte[] hashToEncrypt = digestInfo.getEncoded();
+		
 		//criptografa com o cipher da instancia
 		try
 		{
@@ -284,19 +293,42 @@ public class MySignature
 		this.privada = null;
 		return null;
 	}
-	//public final void initVerify(publicKey chavePublica){}
-	//public final void verify(byte[] signature){}
-	// use to make the signature: Cipher +
-	//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(DigestTipo);
-	//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, messageHash);
-	//byte[] hashToEncrypt = digestInfo.getEncoded();
-	//this.cifra(Cipher.DECRYPT_MODE, publica);
-	//this.cifra.doFinal(signature);
+	//public final void initVerify(publicKey chavePublica)
+	//{
+		//if (this.verifying)
+		//{
+			//System.err.println("Não é possível iniciar a assinatura enquanto verifica");
+			//System.exit(1);
+		//}
+		//if (this.signning)
+		//{
+			//System.err.println("Assinatura já está ativa");
+			//System.exit(1);
+		//}
 
-	// sign() returns signature
-	// initVerify(keypair.getPublic())
-	// verify(signature)
-
+		//this.signning = false;
+		//this.verifying = true;
+		//this.publica = chavePublica;
+		//this.buffer = ByteBuffer.allocate(1024);	
+			
+	//}
+	//public final void verify(byte[] signature)
+	//{
+		//try
+		//{
+		//this.cifra.init(Cipher.ENCRYPT_MODE, privada);
+		//this.cifra.doFinal();
+		//}
+		//catch(InvalidKeyException e)
+		//{
+		//System.err.println("Chave inválida na encryptação");
+		//System.exit(1);
+		//}
+		//buffer.clear();
+		//this.verifying = false;
+		//this.publica = null;
+	//}
+	
 	private static String HexCodeString(byte[] hexCode)
 	{
 		StringBuffer buf = new StringBuffer();
