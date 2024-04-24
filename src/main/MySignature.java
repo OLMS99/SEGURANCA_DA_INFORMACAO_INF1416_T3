@@ -24,7 +24,7 @@ public class MySignature
 	private MessageDigest digestTipo;
 	
 	private Cipher cifra;
-	private KeyGenerator keyGen;
+	private KeyPairGenerator keyGen;
 	private int keysize;
 	private PrivateKey privada;
 	private PublicKey publica;
@@ -98,24 +98,39 @@ public class MySignature
 		
 		try
 		{
-			this.cifra = Cipher.getInstance(tipoCifra);
-			this.keyGen = KeyGenerator.getInstance(tipoCifra);
+			
+			this.keyGen = KeyPairGenerator.getInstance(tipoCifra);
 			keyGen.initialize(4096);
 		}
 		catch(NoSuchAlgorithmException e)
 		{
 			System.err.println(tipoCifra + " não é um algoritmo suportado");
 			System.exit(1);
-		}
+		} 
 		
-		try{
+		try
+		{
 			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);
 		}
 		catch(NoSuchAlgorithmException e){
 			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
 			System.exit(1);
 		}
-		
+
+		try
+		{
+			this.cifra = Cipher.getInstance(tipoCifra);
+		}
+		catch(NoSuchPaddingException e)
+		{
+			System.err.println(this.cypherDigest + " não é um padding suportado");
+			System.exit(1);
+		}
+		catch(NoSuchAlgorithmException e)
+		{
+			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
+			System.exit(1);
+		}
 	}
 	
 	public static final MySignature getInstance(String padraoAssinatura)
@@ -251,8 +266,17 @@ public class MySignature
 		
 		//adiciona sinal do algoritmo usado no inicio da array de bytes
 		//criptografa com o cipher da instancia
-		this.cifra.init(Cipher.ENCRYPT_MODE, privada);
-		//this.cifra.doFinal();
+		try
+		{
+			this.cifra.init(Cipher.ENCRYPT_MODE, privada);
+			//this.cifra.doFinal();
+		}
+		catch(InvalidKeyException e)
+		{
+			System.err.println("Chave inválida na encryptação");
+			System.exit(1);
+		}
+		
 		System.out.println( "criptografia do digest terminado" );
 
 		buffer.clear();
