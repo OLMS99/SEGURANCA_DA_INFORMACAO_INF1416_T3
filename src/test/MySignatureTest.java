@@ -20,6 +20,14 @@ public class MySignatureTest
 	}*/
 
 	// ProcessBuilder talvez???
+	// System.out.println( "Iniciando verificação da assinatura" );
+	//System.out.println( "verificação da assinatura terminada" ); */
+	//System.out.println( "Iniciando criptografia da mensagem" );
+	//System.out.println( "criptografia da mensagem terminada" );
+	//System.out.println( "Iniciando criptografia do digest" );
+	//System.out.println( "criptografia do digest terminado" );
+	// System.out.println("Digest:\n "+ HexCodeString(MySignature.HexCodeString(digest)));
+	// System.out.println("Assinatura:\n "+ HexCodeString(MySignature.HexCodeString(assinatura)));
 	
 	public static void main(String[] args)
 	{

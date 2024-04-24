@@ -69,30 +69,13 @@ public class MySignature
 		//byte[] assinatura = signningProcess.sign();
 		//
 
-		// System.out.println( "Iniciando verificação da assinatura" );
+		
 		// signningProcess.initVerify(chaves.getPublic())
 		// signningProcess.update(digest)
 
-		/*try
-		{
-			if (signningProcess.verify(assinatura)) 
-			{
-				System.out.println( "Signature verified" );
-			} 
-		  	else
-			{ 
-				System.out.println( "Signature failed" );
-			}
-		} 
-		catch (Exception se) 
-		{
-			System.out.println( "Singature failed" );
-		}
+		
 
-		System.out.println( "verificação da assinatura terminada" ); */
-
-		// System.out.println("Digest:\n "+ HexCodeString(MySignature.HexCodeString(digest)));
-		// System.out.println("Assinatura:\n "+ HexCodeString(MySignature.HexCodeString(assinatura)));
+		
 	}
 	
 	private static class SingletonHelper
@@ -185,7 +168,7 @@ public class MySignature
 		}
 	}
 
-	protected byte[] makeDigest(byte[] text) 
+	public byte[] makeDigest(byte[] text) 
 	{
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
@@ -218,7 +201,7 @@ public class MySignature
 		return result;
 	}
 	
-	protected byte[] makeDigest(String text) 
+	public byte[] makeDigest(String text) 
 	{
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
@@ -279,15 +262,15 @@ public class MySignature
 	public final byte[] sign()
 	{
 
-		System.out.println( "Iniciando criptografia da mensagem" );
+		
 		byte[] digest = makeDigest(buffer.array());
-		System.out.println( "criptografia da mensagem terminada" );
+		
 
 
-		System.out.println( "Iniciando criptografia do digest" );
+		
 		//adiciona sinal do algoritmo usado no inicio da array de bytes
 		//DigestAlgorithmIdentifierFinder hashAlgorithmFinder = new DefaultDigestAlgorithmIdentifierFinder();
-		//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.DigestTipo);
+		//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.digestTipo);
 		//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, digest);
 		//byte[] hashToEncrypt = digestInfo.getEncoded();
 		
@@ -295,59 +278,75 @@ public class MySignature
 		try
 		{
 			this.cifra.init(Cipher.ENCRYPT_MODE, holder);
-			//this.cifra.doFinal();
+			//this.cifra.doFinal(hashToEncrypt);
 		}
 		catch(InvalidKeyException e)
 		{
 			System.err.println("Chave inválida na encryptação");
 			System.exit(1);
 		}
-		
-		System.out.println( "criptografia do digest terminado" );
 
 		buffer.clear();
 		this.signning = false;
 		this.holder = null;
 		return null;
 	}
-	//public final void initVerify(publicKey chavePublica)
-	//{
-		//if (this.signning)
-		//{
-			//System.err.println("Não é possível iniciar a verificação enquanto assina");
-			//System.exit(1);
-		//}
-		//if (this.verifying)
-		//{
-			//System.err.println("Verificação já está ativa");
-			//System.exit(1);
-		//}
-
-		//this.signning = false;
-		//this.verifying = true;
-		//this.holder = chavePublica;
-		//this.buffer = ByteBuffer.allocate(2048);	
-			
-	//}
 	
-	//public final void verify(byte[] signature)
-	//{
-		//try
-		//{
-		//this.cifra.init(Cipher.DECRYPT_MODE, holder);
-		//byte[] encodedDigest = this.cifra.doFinal(signature);
+	public final void initVerify(PublicKey chavePublica)
+	{
+		if (this.signning)
+		{
+			System.err.println("Não é possível iniciar a verificação enquanto assina");
+			System.exit(1);
+		}
+		if (this.verifying)
+		{
+			System.err.println("Verificação já está ativa");
+			System.exit(1);
+		}
+
+		this.signning = false;
+		this.verifying = true;
+		this.holder = chavePublica;
+		this.buffer = ByteBuffer.allocate(2048);	
+			
+	}
+	
+	public final void verify(byte[] signature)
+	{
+		byte[] encodedDigest = null;
+		try
+		{
+			this.cifra.init(Cipher.DECRYPT_MODE, holder);
+			//encodedDigest = this.cifra.doFinal(signature);
 		//DigestInfo 
 		//cria digest do texto plano e compara, usa a função que converte para String para facilitar
-		//}
-		//catch(InvalidKeyException e)
+		}
+		catch(InvalidKeyException e)
+		{
+			System.err.println("Chave inválida na decryptação");
+			System.exit(1);
+		}
+		//try
 		//{
-		//System.err.println("Chave inválida na decryptação");
-		//System.exit(1);
+		//	if () 
+		//	{
+		//		System.out.println( "Signature verified" );
+		//	} 
+		//		else
+		//	{ 
+		//		System.out.println( "Signature failed" );
+		//	}
+		//} 
+		//catch (Exception se) 
+		//{
+		//	System.out.println( "Singature failed" );
 		//}
-		//buffer.clear();
-		//this.verifying = false;
-		//this.holder = null;
-	//}
+		
+		buffer.clear();
+		this.verifying = false;
+		this.holder = null;
+	}
 	
 	private static String HexCodeString(byte[] hexCode)
 	{
