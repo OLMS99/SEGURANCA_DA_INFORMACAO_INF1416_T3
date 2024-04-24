@@ -8,18 +8,24 @@ import java.lang.*;
 import java.util.*;
 package MySignature;
 	
-public class MySignatureTest {
-	////if (isWindows) {
-	//		builder.command("cmd.exe", "/c", "dir");
-	//} else {
-	//		builder.command("sh", "-c", "ls");
-	//}
-	//ProcessBuilder talvez???
+public class MySignatureTest 
+{
+	/*if (isWindows)
+	{
+		builder.command("cmd.exe", "/c", "dir");
+	} 
+	else 
+	{	
+		builder.command("sh", "-c", "ls");
+	}*/
+
+	// ProcessBuilder talvez???
+	
 	public static void main(String[] args)
 	{
 		
 	}
-	//receber o padrão de assinatura e a string que deve ser assinada, nesta ordem, como argumento na linha de comando
+	// receber o padrão de assinatura e a string que deve ser assinada, nesta ordem, como argumento na linha de comando
 	
 	// gerar o par de chaves assimétricas para gerar a assinatura digital da string recebida na linha de comando
 	

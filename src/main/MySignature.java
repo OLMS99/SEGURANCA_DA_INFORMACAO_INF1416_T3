@@ -41,25 +41,36 @@ public class MySignature
 		MySignature signningProcess = MySignature.getInstance(signatureStandard);
 		
 		KeyPair chaves = signningProcess.keyGen.generateKeyPair();
+
 		//signningProcess.initSign(chaves.getPrivate());
 		//signningProcess.update(plainText);
 		//byte[] assinatura = signningProcess.sign();
 		//
 
-		//System.out.println( "Iniciando verificação da assinatura" );
-		//signningProcess.initVerify(chaves.getPublic())
-		//signningProcess.update(digest)
-		//try {
-		//	if (signningProcess.verify(assinatura)) {
-		//		System.out.println( "Signature verified" );
-		//	} else System.out.println( "Signature failed" );
-		//} catch (SignatureException se) {
-		//	System.out.println( "Singature failed" );
-		//}
-		//System.out.println( "verificação da assinatura terminada" );
+		// System.out.println( "Iniciando verificação da assinatura" );
+		// signningProcess.initVerify(chaves.getPublic())
+		// signningProcess.update(digest)
 
-		//System.out.println("Digest:\n "+ HexCodeString(MySignature.HexCodeString(digest)));
-		//System.out.println("Assinatura:\n "+ HexCodeString(MySignature.HexCodeString(assinatura)));
+		/*try
+		{
+			if (signningProcess.verify(assinatura)) 
+			{
+				System.out.println( "Signature verified" );
+			} 
+		  	else
+			{ 
+				System.out.println( "Signature failed" );
+			}
+		} 
+		catch (SignatureException se) 
+		{
+			System.out.println( "Singature failed" );
+		}
+
+		System.out.println( "verificação da assinatura terminada" ); */
+
+		// System.out.println("Digest:\n "+ HexCodeString(MySignature.HexCodeString(digest)));
+		// System.out.println("Assinatura:\n "+ HexCodeString(MySignature.HexCodeString(assinatura)));
 	}
 	
 	private static class SingletonHelper
@@ -110,12 +121,14 @@ public class MySignature
 		// Padrões de assinatura suportados:
 		HashSet<String> padroesSuportadosAss = new HashSet<String>(Arrays.asList("MD5withRSA", "SHA1withRSA", "SHA256withRSA", "SHA512withRSA", "SHA256withECDSA"));
 
-		if(!padroesSuportadosAss.contains(padraoAssinatura)){
+		if(!padroesSuportadosAss.contains(padraoAssinatura))
+		{
 			System.err.println("Padrão de assinatura não suportado");
 			System.exit(1);
 		}
-		
-		switch(padraoAssinatura){
+
+		switch(padraoAssinatura)
+		{
 			case "MD5withRSA":
 				return SingletonHelper.MD5withRSA;
 			case "SHA1withRSA":
@@ -133,16 +146,20 @@ public class MySignature
 		}
 	}
 	
-	protected byte[] makeDigest(String text) {
-
+	protected byte[] makeDigest(String text) 
+	{
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
 		byte[] result = {};
-		try {
+
+		try 
+		{
 			byte[] bytebuffer = new byte[bufferSize];
 			InputStream leitor = new ByteArrayInputStream(text.getBytes());
 			int check = leitor.read(bytebuffer);
-			while (check != -1) {
+
+			while (check != -1)
+			{
 				digestTipo.update(bytebuffer, 0, check);
 				check = leitor.read(bytebuffer);
 			}
@@ -150,12 +167,15 @@ public class MySignature
 			leitor.close();
 			result = digestTipo.digest();
 
-		} catch (IOException e) {
+		} 
+		catch (IOException e)
+		{
 
 			System.err.println("Erro na leitura do arquivo durante o calculo do digest");
 			System.exit(1);
 
-		} 
+		}
+		 
 		return result;
 	}
 
@@ -211,6 +231,7 @@ public class MySignature
 	//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, messageHash);
 	//byte[] hashToEncrypt = digestInfo.getEncoded();
 	//this.cifra(CIPHERS.DECRYPT_MODE,);
+
 	// sign() returns signature
 	// initVerify(keypair.getPublic())
 	// verify(signature)
