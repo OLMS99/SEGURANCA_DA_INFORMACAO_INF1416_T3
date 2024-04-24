@@ -7,7 +7,7 @@ import java.util.*;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteBuffer;
+import java.nio.ByteBuffer;
 import java.io.IOException;
 
 import java.security.*;
@@ -17,13 +17,15 @@ public class MySignature
 {
 	private Boolean signning;
 	private Boolean verifying;
-	private byteBuffer buffer;
+	private ByteBuffer buffer;
 	
 	private String cypherDigest;
 	private String cypherSignature;
 	private MessageDigest digestTipo;
 	
 	private Cipher cifra;
+	private KeyGenerator keyGen;
+	private int keysize;
 	private PrivateKey privada;
 	private PublicKey publica;
 	
@@ -39,8 +41,6 @@ public class MySignature
 		}
 		
 		MySignature signningProcess = MySignature.getInstance(signatureStandard);
-		
-		KeyPair chaves = signningProcess.keyGen.generateKeyPair();
 
 		//signningProcess.initSign(chaves.getPrivate());
 		//signningProcess.update(plainText);
@@ -98,11 +98,13 @@ public class MySignature
 		
 		try
 		{
-			this.keyGen = Cipher.getInstance(tipoCifra);
+			this.cifra = Cipher.getInstance(tipoCifra);
+			this.keyGen = KeyGenerator.getInstance(tipoCifra);
+			keyGen.initialize(4096);
 		}
 		catch(NoSuchAlgorithmException e)
 		{
-			System.err.println(tipoCifra+" não é um algoritmo suportado");
+			System.err.println(tipoCifra + " não é um algoritmo suportado");
 			System.exit(1);
 		}
 		
@@ -110,7 +112,7 @@ public class MySignature
 			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);
 		}
 		catch(NoSuchAlgorithmException e){
-			System.err.println(this.cypherDigest+" não é um algoritmo suportado");
+			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
 			System.exit(1);
 		}
 		
@@ -145,6 +147,39 @@ public class MySignature
 				return null;
 		}
 	}
+
+	protected byte[] makeDigest(byte[] text) 
+	{
+		// adequado: Update(Byte[], Int32, Int32)
+		int bufferSize = 1024;
+		byte[] result = {};
+
+		try 
+		{
+			byte[] bytebuffer = new byte[bufferSize];
+			InputStream leitor = new ByteArrayInputStream(text);
+			int check = leitor.read(bytebuffer);
+
+			while (check != -1)
+			{
+				digestTipo.update(bytebuffer, 0, check);
+				check = leitor.read(bytebuffer);
+			}
+
+			leitor.close();
+			result = digestTipo.digest();
+
+		} 
+		catch (IOException e)
+		{
+
+			System.err.println("Erro na leitura da mensagem durante o calculo do digest");
+			System.exit(1);
+
+		}
+
+		return result;
+	}
 	
 	protected byte[] makeDigest(String text) 
 	{
@@ -171,7 +206,7 @@ public class MySignature
 		catch (IOException e)
 		{
 
-			System.err.println("Erro na leitura do arquivo durante o calculo do digest");
+			System.err.println("Erro na leitura da mensagem durante o calculo do digest");
 			System.exit(1);
 
 		}
@@ -195,12 +230,12 @@ public class MySignature
 		this.signning = true;
 		this.verifying = false;
 		this.privada = chavePrivada;
-		this.buffer = new byteBuffer();	
+		this.buffer = ByteBuffer.allocate(1024);	
 	}
 	
 	public final void update(String text)
 	{
-		byte[] plainText = text.getbytes();
+		byte[] plainText = text.getBytes();
 		buffer.put(plainText);
 	}
 	
@@ -208,21 +243,22 @@ public class MySignature
 	{
 
 		System.out.println( "Iniciando criptografia da mensagem" );
-		byte[] digest =  signningProcess.makeDigest(buffer);
-		System.out.println( "criptografia da mensagem terminado" );
+		byte[] digest = makeDigest(buffer.array());
+		System.out.println( "criptografia da mensagem terminada" );
 
 
 		System.out.println( "Iniciando criptografia do digest" );
 		
 		//adiciona sinal do algoritmo usado no inicio da array de bytes
 		//criptografa com o cipher da instancia
-		//this.cifra(CIPHERS.ENCRYPT_MODE,);
+		this.cifra.init(Cipher.ENCRYPT_MODE, privada);
+		//this.cifra.doFinal();
 		System.out.println( "criptografia do digest terminado" );
 
 		buffer.clear();
 		this.signning = false;
 		this.privada = null;
-		return result;
+		return null;
 	}
 	//public final void initVerify(publicKey chavePublica){}
 	//public final void verify(byte[] signature){}
@@ -230,7 +266,8 @@ public class MySignature
 	//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(DigestTipo);
 	//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, messageHash);
 	//byte[] hashToEncrypt = digestInfo.getEncoded();
-	//this.cifra(CIPHERS.DECRYPT_MODE,);
+	//this.cifra(Cipher.DECRYPT_MODE, publica);
+	//this.cifra.doFinal(signature);
 
 	// sign() returns signature
 	// initVerify(keypair.getPublic())
