@@ -24,7 +24,6 @@ public class MySignature
 	private MessageDigest digestTipo;
 	
 	private Cipher cifra;
-	private int keysize;
 	private Key holder;
 	
 	public static void main(String[] args)
@@ -38,7 +37,7 @@ public class MySignature
 		try
 		{
 			Provider p = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-			int result = Security.addProvider(p);
+			Security.addProvider(p);
 		} 
 		catch(Exception e)
 		{
@@ -72,9 +71,6 @@ public class MySignature
 		
 		// signningProcess.initVerify(chaves.getPublic())
 		// signningProcess.update(digest)
-
-		
-
 		
 	}
 	
@@ -99,7 +95,8 @@ public class MySignature
 		}
 
 		this.cypherSignature = tipoCifra;
-		
+		this.signning = false;
+		this.verifying = false;
 		try
 		{
 			this.cifra = Cipher.getInstance(tipoCifra);
@@ -123,6 +120,7 @@ public class MySignature
 			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
 			System.exit(1);
 		}
+
 		this.cifra = null;
 		try
 		{
@@ -261,24 +259,20 @@ public class MySignature
 	
 	public final byte[] sign()
 	{
-
 		
 		byte[] digest = makeDigest(buffer.array());
 		
-
-
-		
 		//adiciona sinal do algoritmo usado no inicio da array de bytes
-		//DigestAlgorithmIdentifierFinder hashAlgorithmFinder = new DefaultDigestAlgorithmIdentifierFinder();
-		//AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.digestTipo);
-		//DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, digest);
-		//byte[] hashToEncrypt = digestInfo.getEncoded();
+		DigestAlgorithmIdentifierFinder hashAlgorithmFinder = new DefaultDigestAlgorithmIdentifierFinder();
+		AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.digestTipo);
+		DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, digest);
+		byte[] hashToEncrypt = digestInfo.getEncoded();
 		
 		//criptografa com o cipher da instancia
 		try
 		{
 			this.cifra.init(Cipher.ENCRYPT_MODE, holder);
-			//this.cifra.doFinal(hashToEncrypt);
+			this.cifra.doFinal(hashToEncrypt);
 		}
 		catch(InvalidKeyException e)
 		{
@@ -312,40 +306,44 @@ public class MySignature
 			
 	}
 	
-	public final void verify(byte[] signature)
+	public final Boolean verify(byte[] signature)
 	{
-		byte[] encodedDigest = null;
+		byte[] originalDigest = null;
 		try
 		{
 			this.cifra.init(Cipher.DECRYPT_MODE, holder);
-			//encodedDigest = this.cifra.doFinal(signature);
-		//DigestInfo 
-		//cria digest do texto plano e compara, usa a função que converte para String para facilitar
+			originalDigest = this.cifra.doFinal(signature);
 		}
 		catch(InvalidKeyException e)
 		{
 			System.err.println("Chave inválida na decryptação");
 			System.exit(1);
 		}
-		//try
-		//{
-		//	if () 
-		//	{
-		//		System.out.println( "Signature verified" );
-		//	} 
-		//		else
-		//	{ 
-		//		System.out.println( "Signature failed" );
-		//	}
-		//} 
-		//catch (Exception se) 
-		//{
-		//	System.out.println( "Singature failed" );
-		//}
-		
+
+		MessageDigest temp = null;
+		byte[] uncodedDigest = null;
+		byte[] tempDigest = null;
+		AlgorithmIdentifier hashAlgorithmIdentifier = null;
+		DigestInfo tempDigestInfo = null;
+		try
+		{
+			temp = MessageDigest.getInstance(this.cypherSignature);
+			uncodedDigest = temp.digest(this.buffer);
+			hashAlgorithmIdentifier = new DefaultDigestAlgorithmIdentifierFinder().find(this.cypherDigest);
+			tempDigestInfo = new DigestInfo(hashAlgorithmIdentifier, uncodedDigest);
+			tempDigest = digestInfo.getEncoded();
+		}
+		catch(Exception e)
+		{
+			System.err.println("Erro durante o calculo de um digest no processo de verificação");
+			System.exit(1);
+		}
+
 		buffer.clear();
 		this.verifying = false;
 		this.holder = null;
+
+		return Arrays.equals(tempDigest,originalDigest);
 	}
 	
 	private static String HexCodeString(byte[] hexCode)
