@@ -64,7 +64,6 @@ public class MySignature
 			System.err.println("erro na geração de chaves");
 			System.exit(1);
 		}
-
 		signningProcess.initSign(chaves.getPrivate());
 		signningProcess.update(plainText);
 		// byte[] assinatura = signningProcess.sign();
@@ -73,7 +72,6 @@ public class MySignature
 
 		// signningProcess.initVerify(chaves.getPublic())
 		// signningProcess.update(digest)
-
 	}
 
 	private static class SingletonHelper
@@ -352,7 +350,7 @@ public class MySignature
 		return Arrays.equals(tempDigest,originalDigest);
 	}
 	
-	private static String HexCodeString(byte[] hexCode)
+	public static String HexCodeString(byte[] hexCode)
 	{
 		StringBuffer buf = new StringBuffer();
 
