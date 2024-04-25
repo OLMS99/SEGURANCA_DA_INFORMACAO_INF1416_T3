@@ -20,14 +20,14 @@ public class MySignature
 	private Boolean signning;
 	private Boolean verifying;
 	private ByteBuffer buffer;
-	
+
 	private final String cypherDigest;
 	private final String cypherSignature;
 	private MessageDigest digestTipo;
-	
+
 	private Cipher cifra;
 	private Key holder;
-	
+
 	public static void main(String[] args)
 	{
 		if (args.length !=2)
@@ -40,7 +40,7 @@ public class MySignature
 		{
 			Provider p = new org.bouncycastle.jce.provider.BouncyCastleProvider();
 			Security.addProvider(p);
-		} 
+		}
 		catch(Exception e)
 		{
 			System.err.println("Erro ao carregar o provider BouncyCastle");
@@ -58,7 +58,7 @@ public class MySignature
 			keyGen = KeyPairGenerator.getInstance(signningProcess.cypherSignature);
 			chaves = keyGen.generateKeyPair();
 			keyGen.initialize(4096);
-		} 
+		}
 		catch(Exception e)
 		{
 			System.err.println("erro na geração de chaves");
@@ -70,12 +70,12 @@ public class MySignature
 		// byte[] assinatura = signningProcess.sign();
 		//
 
-		
+
 		// signningProcess.initVerify(chaves.getPublic())
 		// signningProcess.update(digest)
-		
+
 	}
-	
+
 	private static class SingletonHelper
 	{
 		private static final MySignature MD5withRSA = new MySignature("MD5","RSA");
@@ -93,8 +93,8 @@ public class MySignature
 		if (tipoDigest.equals("SHA1") || tipoDigest.equals("SHA256") || tipoDigest.equals("SHA512"))
 		{
 			this.cypherDigest = tipoDigest.substring(0, 3) + "-" + tipoDigest.substring(3);
-		} 
-			
+		}
+
 		else
 		{
 			this.cypherDigest = tipoDigest;
@@ -111,13 +111,13 @@ public class MySignature
 		{
 			System.err.println(tipoCifra + " não é um algoritmo suportado");
 			System.exit(1);
-		} 
+		}
 		catch(NoSuchPaddingException e)
 		{
 			System.err.println(tipoCifra + " não é um algoritmo suportado");
 			System.exit(1);
 		}
-		
+
 		try
 		{
 			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);
@@ -143,7 +143,7 @@ public class MySignature
 			System.exit(1);
 		}
 	}
-	
+
 	public static final MySignature getInstance(String padraoAssinatura)
 	{
 		// Padrões de assinatura suportados:
@@ -172,13 +172,13 @@ public class MySignature
 		}
 	}
 
-	public byte[] makeDigest(byte[] text) 
+	public byte[] makeDigest(byte[] text)
 	{
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
 		byte[] result = {};
 
-		try 
+		try
 		{
 			byte[] bytebuffer = new byte[bufferSize];
 			InputStream leitor = new ByteArrayInputStream(text);
@@ -193,7 +193,7 @@ public class MySignature
 			leitor.close();
 			result = digestTipo.digest();
 
-		} 
+		}
 		catch (IOException e)
 		{
 
@@ -204,14 +204,14 @@ public class MySignature
 
 		return result;
 	}
-	
+
 	public byte[] makeDigest(String text) 
 	{
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
 		byte[] result = {};
 
-		try 
+		try
 		{
 			byte[] bytebuffer = new byte[bufferSize];
 			InputStream leitor = new ByteArrayInputStream(text.getBytes());
@@ -226,7 +226,7 @@ public class MySignature
 			leitor.close();
 			result = digestTipo.digest();
 
-		} 
+		}
 		catch (IOException e)
 		{
 
@@ -234,7 +234,7 @@ public class MySignature
 			System.exit(1);
 
 		}
-		 
+
 		return result;
 	}
 
@@ -250,30 +250,30 @@ public class MySignature
 			System.err.println("Assinatura já está ativa");
 			System.exit(1);
 		}
-		
+
 		this.signning = true;
 		this.verifying = false;
 		this.holder = chavePrivada;
 		this.buffer = ByteBuffer.allocate(2048);	
 	}
-	
+
 	public final void update(String text)
 	{
 		byte[] plainText = text.getBytes();
 		buffer.put(plainText);
 	}
-	
+
 	public final byte[] sign()
 	{
-		
+
 		byte[] digest = makeDigest(buffer.array());
-		
+
 		//adiciona sinal do algoritmo usado no inicio da array de bytes
 		DigestAlgorithmIdentifierFinder hashAlgorithmFinder = new DefaultDigestAlgorithmIdentifierFinder();
-		AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.digestTipo);
+		AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.cypherDigest);
 		DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, digest);
 		byte[] hashToEncrypt = digestInfo.getEncoded();
-		
+
 		//criptografa com o cipher da instancia
 		try
 		{
@@ -291,7 +291,7 @@ public class MySignature
 		this.holder = null;
 		return null;
 	}
-	
+
 	public final void initVerify(PublicKey chavePublica)
 	{
 		if (this.signning)
@@ -308,10 +308,10 @@ public class MySignature
 		this.signning = false;
 		this.verifying = true;
 		this.holder = chavePublica;
-		this.buffer = ByteBuffer.allocate(2048);	
-			
+		this.buffer = ByteBuffer.allocate(2048);
+
 	}
-	
+
 	public final Boolean verify(byte[] signature)
 	{
 		byte[] originalDigest = null;
