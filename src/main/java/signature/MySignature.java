@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.io.IOException;
 
 import java.security.*;
-import java.security.Provider;
+
 import javax.crypto.*;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -241,7 +241,7 @@ public class MySignature
 
 			leitor.close();
 			result = digestTipo.digest();
-
+			Arrays.fill(bytebuffer,(byte)0);
 		}
 		catch (IOException e)
 		{
@@ -283,11 +283,12 @@ public class MySignature
 	{
 
 		byte[] digest = makeDigest(buffer.array());
+		byte[] result = null;
 		//criptografa com o cipher da instancia
 		try
 		{
 			this.cifra.init(Cipher.ENCRYPT_MODE, holder);
-			this.cifra.doFinal(digest);
+			result = this.cifra.doFinal(digest);
 		}
 		catch(InvalidKeyException e)
 		{
@@ -309,7 +310,7 @@ public class MySignature
 		this.signning = false;
 		this.holder = null;
 		System.out.println( "criptografia da mensagem terminada" );
-		return null;
+		return result;
 	}
 
 	public final void initVerify(PublicKey chavePublica)
@@ -337,6 +338,7 @@ public class MySignature
 	public final Boolean verify(byte[] signature)
 	{
 		byte[] originalDigest = null;
+		boolean result = false;
 		try
 		{
 			this.cifra.init(Cipher.DECRYPT_MODE, holder);
@@ -365,6 +367,9 @@ public class MySignature
 			byte[] temp = new byte[buffer.position()];
 			this.buffer.get(temp);
 			tempDigest = makeDigest(temp);
+
+			result = Arrays.equals(tempDigest, originalDigest);
+
 			Arrays.fill(temp, (byte)0);
 		}
 		catch(Exception e)
@@ -373,13 +378,23 @@ public class MySignature
 			System.exit(1);
 		}
 
+		System.out.println( "verificação da assinatura terminada" );
+		{
+			if(result)
+			{
+				System.out.println( "Signature verified" );
+			}
+			else
+			{
+				System.out.println( "Signature failed" );
+			}
+		}
+
 		buffer.clear();
 		this.verifying = false;
 		this.holder = null;
 
-		System.out.println( "verificação da assinatura terminada" );
-
-		return Arrays.equals(tempDigest, originalDigest);
+		return result;
 	}
 
 	public static String HexCodeString(byte[] hexCode)
