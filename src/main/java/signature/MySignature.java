@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.security.*;
 import javax.crypto.*;
 
+import org.bouncycastle.jcajce.provider.digest.*;
 public class MySignature
 {
 	private Boolean signning;
@@ -38,8 +39,9 @@ public class MySignature
 
 		try
 		{
-			Provider p = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-			Security.addProvider(p);
+			if (Provider.getProvider("BC") == null){
+				java.security.Security.addProvider(new BouncyCastleProvider());
+			}
 		}
 		catch(Exception e)
 		{
@@ -64,14 +66,16 @@ public class MySignature
 			System.err.println("erro na geração de chaves");
 			System.exit(1);
 		}
+
 		signningProcess.initSign(chaves.getPrivate());
 		signningProcess.update(plainText);
-		// byte[] assinatura = signningProcess.sign();
-		//
+		byte[] assinatura = signningProcess.sign();
 
+		signningProcess.initVerify(chaves.getPublic());
+		signningProcess.update(plainText);
+		signningProcess.verify(assinatura);
 
-		// signningProcess.initVerify(chaves.getPublic())
-		// signningProcess.update(digest)
+		System.out.println("Assinatura da mensagem: " + MySignature.HexCodeString(assinatura));
 	}
 
 	private static class SingletonHelper
@@ -112,23 +116,29 @@ public class MySignature
 		}
 		catch(NoSuchPaddingException e)
 		{
-			System.err.println(tipoCifra + " não é um algoritmo suportado");
+			System.err.println(tipoCifra + " não é um padding suportado");
 			System.exit(1);
 		}
 
 		try
 		{
-			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);
+			this.digestTipo = MessageDigest.getInstance(this.cypherDigest, "BC");
 		}
-		catch(NoSuchAlgorithmException e){
-			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
+		catch(NoSuchAlgorithmException e)
+		{
+			System.err.println(this.cypherDigest + " não é um algoritmo de digest suportado");
+			System.exit(1);
+		}
+		catch(NoSuchProviderException e )
+		{
+			System.err.println("Provider BouncyCastle indisponível na coleta de instancia de calculo de digest");
 			System.exit(1);
 		}
 
 		this.cifra = null;
 		try
 		{
-			this.cifra = Cipher.getInstance(tipoCifra);
+			this.cifra = Cipher.getInstance(tipoCifra, "BC");
 		}
 		catch(NoSuchPaddingException e)
 		{
@@ -138,6 +148,11 @@ public class MySignature
 		catch(NoSuchAlgorithmException e)
 		{
 			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
+			System.exit(1);
+		}
+		catch(NoSuchProviderException e )
+		{
+			System.err.println("Provider BouncyCastle indisponível na coleta de instancia de cifra");
 			System.exit(1);
 		}
 	}
@@ -203,7 +218,7 @@ public class MySignature
 		return result;
 	}
 
-	public byte[] makeDigest(String text) 
+	public byte[] makeDigest(String text)
 	{
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
@@ -252,7 +267,7 @@ public class MySignature
 		this.signning = true;
 		this.verifying = false;
 		this.holder = chavePrivada;
-		this.buffer = ByteBuffer.allocate(2048);	
+		this.buffer = ByteBuffer.allocate(2048);
 	}
 
 	public final void update(String text)
@@ -265,22 +280,25 @@ public class MySignature
 	{
 
 		byte[] digest = makeDigest(buffer.array());
-
-		//adiciona sinal do algoritmo usado no inicio da array de bytes
-		DigestAlgorithmIdentifierFinder hashAlgorithmFinder = new DefaultDigestAlgorithmIdentifierFinder();
-		AlgorithmIdentifier hashingAlgorithmIdentifier = hashAlgorithmFinder.find(this.cypherDigest);
-		DigestInfo digestInfo = new DigestInfo(hashingAlgorithmIdentifier, digest);
-		byte[] hashToEncrypt = digestInfo.getEncoded();
-
 		//criptografa com o cipher da instancia
 		try
 		{
 			this.cifra.init(Cipher.ENCRYPT_MODE, holder);
-			this.cifra.doFinal(hashToEncrypt);
+			this.cifra.doFinal(digest);
 		}
 		catch(InvalidKeyException e)
 		{
-			System.err.println("Chave inválida na encryptação");
+			System.err.println("Chave inválida na encriptação");
+			System.exit(1);
+		}
+		catch(IllegalBlockSizeException e)
+		{
+			System.err.println("Erro no tamanho do bloco alocado na encriptação");
+			System.exit(1);
+		}
+		catch(BadPaddingException e)
+		{
+			System.err.println("Erro no padding na encriptação");
 			System.exit(1);
 		}
 
@@ -320,22 +338,28 @@ public class MySignature
 		}
 		catch(InvalidKeyException e)
 		{
-			System.err.println("Chave inválida na decryptação");
+			System.err.println("Chave inválida na decriptação");
+			System.exit(1);
+		}
+		catch(IllegalBlockSizeException e)
+		{
+			System.err.println("Erro no tamanho do bloco alocado na decriptação");
+			System.exit(1);
+		}
+		catch(BadPaddingException e)
+		{
+			System.err.println("Erro no padding na decriptação");
 			System.exit(1);
 		}
 
-		MessageDigest temp = null;
-		byte[] uncodedDigest = null;
 		byte[] tempDigest = null;
-		AlgorithmIdentifier hashAlgorithmIdentifier = null;
-		DigestInfo tempDigestInfo = null;
+
 		try
 		{
-			temp = MessageDigest.getInstance(this.cypherSignature);
-			uncodedDigest = temp.digest(this.buffer);
-			hashAlgorithmIdentifier = new DefaultDigestAlgorithmIdentifierFinder().find(this.cypherDigest);
-			tempDigestInfo = new DigestInfo(hashAlgorithmIdentifier, uncodedDigest);
-			tempDigest = digestInfo.getEncoded();
+			byte[] temp = new byte[2048];
+			this.buffer.get(temp);
+			tempDigest = makeDigest(temp);
+			Arrays.fill(temp, (byte)0);
 		}
 		catch(Exception e)
 		{
@@ -347,7 +371,7 @@ public class MySignature
 		this.verifying = false;
 		this.holder = null;
 
-		return Arrays.equals(tempDigest,originalDigest);
+		return Arrays.equals(tempDigest, originalDigest);
 	}
 	
 	public static String HexCodeString(byte[] hexCode)
