@@ -13,9 +13,11 @@ import java.nio.ByteBuffer;
 import java.io.IOException;
 
 import java.security.*;
+import java.security.Provider;
 import javax.crypto.*;
 
-import org.bouncycastle.jcajce.provider.digest.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 public class MySignature
 {
 	private Boolean signning;
@@ -39,7 +41,7 @@ public class MySignature
 
 		try
 		{
-			if (Provider.getProvider("BC") == null){
+			if (Security.getProvider("BC") == null){
 				java.security.Security.addProvider(new BouncyCastleProvider());
 			}
 		}
@@ -190,7 +192,7 @@ public class MySignature
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
 		byte[] result = {};
-
+		System.out.println( "Iniciando criptografia do digest" );
 		try
 		{
 			byte[] bytebuffer = new byte[bufferSize];
@@ -214,7 +216,8 @@ public class MySignature
 			System.exit(1);
 
 		}
-
+		System.out.println( "criptografia do digest terminado" );
+		System.out.println("Digest:\n "+ HexCodeString(result) + "\n");
 		return result;
 	}
 
@@ -223,7 +226,7 @@ public class MySignature
 		// adequado: Update(Byte[], Int32, Int32)
 		int bufferSize = 1024;
 		byte[] result = {};
-
+		System.out.println( "Iniciando criptografia do digest" );
 		try
 		{
 			byte[] bytebuffer = new byte[bufferSize];
@@ -247,7 +250,7 @@ public class MySignature
 			System.exit(1);
 
 		}
-
+		System.out.println( "criptografia do digest terminado" );
 		return result;
 	}
 
@@ -263,7 +266,7 @@ public class MySignature
 			System.err.println("Assinatura já está ativa");
 			System.exit(1);
 		}
-
+		System.out.println( "Iniciando assinatura da mensagem" );
 		this.signning = true;
 		this.verifying = false;
 		this.holder = chavePrivada;
@@ -305,6 +308,7 @@ public class MySignature
 		buffer.clear();
 		this.signning = false;
 		this.holder = null;
+		System.out.println( "criptografia da mensagem terminada" );
 		return null;
 	}
 
@@ -320,6 +324,8 @@ public class MySignature
 			System.err.println("Verificação já está ativa");
 			System.exit(1);
 		}
+
+		System.out.println( "Iniciando verificação da assinatura" );
 
 		this.signning = false;
 		this.verifying = true;
@@ -356,7 +362,7 @@ public class MySignature
 
 		try
 		{
-			byte[] temp = new byte[2048];
+			byte[] temp = new byte[buffer.position()];
 			this.buffer.get(temp);
 			tempDigest = makeDigest(temp);
 			Arrays.fill(temp, (byte)0);
@@ -371,9 +377,11 @@ public class MySignature
 		this.verifying = false;
 		this.holder = null;
 
+		System.out.println( "verificação da assinatura terminada" );
+
 		return Arrays.equals(tempDigest, originalDigest);
 	}
-	
+
 	public static String HexCodeString(byte[] hexCode)
 	{
 		StringBuffer buf = new StringBuffer();
