@@ -40,7 +40,11 @@ public class MySignatureTest {
 	}
 	"java MySignature"
 	"java MySignature SHA1withRSA"
+	"java MySignature 'MENSAGEM SECRETA'"
+	"java MySignature MD5withRSA 'MENSAGEM SECRETA'"
 	"java MySignature SHA1withRSA 'MENSAGEM SECRETA'"
+	"java MySignature SHA256withRSA 'MENSAGEM SECRETA'"
+	"java MySignature SHA512withRSA 'MENSAGEM SECRETA'"
 	*/
 
 	public static void main(String[] args) {
