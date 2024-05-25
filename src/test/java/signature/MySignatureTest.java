@@ -23,20 +23,24 @@ import java.security.*;
 import javax.crypto.*;
 
 public class MySignatureTest {
+	private static String SO = System.getProperty("os.name").toLowerCase();
+	public static boolean IS_WINDOWS = SO.indexOf("win") >= 0;
+	public static boolean IS_UNIX = SO.indexOf("nix") >= 0 || SO.indexOf("nux") >= 0 || SO.indexOf("aix") > 0;
 	/*
-	if (isWindows)
+	ProcessBuilder pd;
+	if (IS_WINDOWS)
 	{
-	ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "dir");
+	pb = new ProcessBuilder("cmd.exe", "/c", "dir");
 	builder.command("cmd.exe", "/c", "dir");
 	}
-	else if (isLinux)
+	else if ()
 	{
-	ProcessBuilder pb = new ProcessBuilder("sh", "-c", "ls");
+	pb = new ProcessBuilder("sh", "-c", "ls");
 	builder.command("sh", "-c", "ls");
 	}
 	else
 	{
-	
+	System.out.println("Sistema operacional não suportado para o teste");
 	}
 	"java MySignature"
 	"java MySignature SHA1withRSA"
