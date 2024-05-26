@@ -26,53 +26,6 @@ public class MySignatureTest {
 	private static String SO = System.getProperty("os.name").toLowerCase();
 	public static boolean IS_WINDOWS = SO.indexOf("win") >= 0;
 	public static boolean IS_UNIX = SO.indexOf("nix") >= 0 || SO.indexOf("nux") >= 0 || SO.indexOf("aix") > 0;
-	/*
-	ProcessBuilder pd;
-	if (IS_WINDOWS)
-	{
-	pb = new ProcessBuilder("cmd.exe", "/c", "dir");
-	builder.command("cmd.exe", "/c", "dir");
-	}
-	else if ()
-	{
-	pb = new ProcessBuilder("sh", "-c", "ls");
-	builder.command("sh", "-c", "ls");
-	}
-	else
-	{
-	System.out.println("Sistema operacional não suportado para o teste");
-	}
-	"java MySignature"
-	"java MySignature SHA1withRSA"
-	"java MySignature 'MENSAGEM SECRETA'"
-	"java MySignature MD5withRSA 'MENSAGEM SECRETA'"
-	"java MySignature SHA1withRSA 'MENSAGEM SECRETA'"
-	"java MySignature SHA256withRSA 'MENSAGEM SECRETA'"
-	"java MySignature SHA512withRSA 'MENSAGEM SECRETA'"
-
-	------------------------------------------------------------
-
-	 * if (isWindows)
-	 * {
-	 * builder.command("cmd.exe", "/c", "dir");
-	 * }
-	 * else
-	 * {
-	 * builder.command("sh", "-c", "ls");
-	 * }
-	 */
-
-	// ProcessBuilder talvez???
-	// System.out.println( "Iniciando verificação da assinatura" );
-	// System.out.println( "verificação da assinatura terminada" ); */
-	// System.out.println( "Iniciando criptografia da mensagem" );
-	// System.out.println( "criptografia da mensagem terminada" );
-	// System.out.println( "Iniciando criptografia do digest" );
-	// System.out.println( "criptografia do digest terminado" );
-	// System.out.println("Digest:\n "+
-	// HexCodeString(MySignature.HexCodeString(digest)));
-	// System.out.println("Assinatura:\n "+
-	// HexCodeString(MySignature.HexCodeString(assinatura)));
 
 	public static void main(String[] args) {
 		if (args.length != 2) {
@@ -110,6 +63,49 @@ public class MySignatureTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		/* 
+		try{
+		Process processoTeste;
+		if (IS_WINDOWS){
+			processoTeste = new ProcessBuilder("java MySignature").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA1withRSA").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature MD5withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA1withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA256withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA512withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+		}
+		else if (IS_UNIX){
+			processoTeste = new ProcessBuilder("java MySignature").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA1withRSA").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature MD5withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA1withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA256withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+			processoTeste = new ProcessBuilder("java MySignature SHA512withRSA 'MENSAGEM SECRETA'").start();
+			System.out.println(processoTeste.getOutputStream());
+		}
+		else{
+			System.out.println("Sistema operacional não suportado para o teste");
+		}
+		} catch(IOException e){
+			System.err.println("erro ao tentar testar comandos da classe MySignature");
+			System.exit(1);
+		}
+		*/
 	}
 
 	private static String bytesToHex(byte[] bytes) {
