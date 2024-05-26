@@ -10,7 +10,7 @@ import java.lang.*;
 import java.util.*;
 import java.security.*;
 
-import signature.MySignature;
+//import signature.MySignature;
 
 import java.util.*;
 
@@ -49,7 +49,30 @@ public class MySignatureTest {
 	"java MySignature SHA1withRSA 'MENSAGEM SECRETA'"
 	"java MySignature SHA256withRSA 'MENSAGEM SECRETA'"
 	"java MySignature SHA512withRSA 'MENSAGEM SECRETA'"
-	*/
+
+	------------------------------------------------------------
+
+	 * if (isWindows)
+	 * {
+	 * builder.command("cmd.exe", "/c", "dir");
+	 * }
+	 * else
+	 * {
+	 * builder.command("sh", "-c", "ls");
+	 * }
+	 */
+
+	// ProcessBuilder talvez???
+	// System.out.println( "Iniciando verificação da assinatura" );
+	// System.out.println( "verificação da assinatura terminada" ); */
+	// System.out.println( "Iniciando criptografia da mensagem" );
+	// System.out.println( "criptografia da mensagem terminada" );
+	// System.out.println( "Iniciando criptografia do digest" );
+	// System.out.println( "criptografia do digest terminado" );
+	// System.out.println("Digest:\n "+
+	// HexCodeString(MySignature.HexCodeString(digest)));
+	// System.out.println("Assinatura:\n "+
+	// HexCodeString(MySignature.HexCodeString(assinatura)));
 
 	public static void main(String[] args) {
 		if (args.length != 2) {
@@ -61,36 +84,29 @@ public class MySignatureTest {
 		String message = args[1];
 
 		try {
-			// Gerar par de chaves assimétricas
-			KeyPairGenerator keyGen = KeyPairGenerator.getInstance(algorithm.contains("RSA") ? "RSA" : "EC");
+			// Gera par de chaves assimétricas
+			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA"); // SHA256withECDSA retirado
 			KeyPair keyPair = keyGen.generateKeyPair();
 
-			// Inicializar MySignature
 			MySignature mySignature = MySignature.getInstance(algorithm);
 
-			// Inicializar para assinatura
 			mySignature.initSign(keyPair.getPrivate());
 
-			// Atualizar com a mensagem
-			mySignature.update(message/* .getBytes()*/);
+			mySignature.update(message);
 
-			// Assinar a mensagem
 			byte[] signature = mySignature.sign();
 
-			// Inicializar para verificação
 			mySignature.initVerify(keyPair.getPublic());
 
-			// Atualizar com a mesma mensagem
-			mySignature.update(message/*.getBytes()*/);
+			mySignature.update(message);
 
-			// Verificar a assinatura
 			boolean verified = mySignature.verify(signature);
 
-			// Imprimir resultados
 			System.out.println("Algorithm: " + algorithm);
 			System.out.println("Message: " + message);
 			System.out.println("Signature: " + bytesToHex(signature));
 			System.out.println("Signature verified: " + verified);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

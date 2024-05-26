@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "src/test/java/signature/bcprov-jdk15on-168.jar"
+    ]
+}

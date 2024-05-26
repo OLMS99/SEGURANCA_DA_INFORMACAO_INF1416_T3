@@ -1,0 +1,29 @@
+{
+    // Use o IntelliSense para saber mais sobre os atributos possíveis.
+    // Focalizar para exibir as descrições dos atributos existentes.
+    // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "args": ["MD5withRSA", "Mensagem_Secreta"],
+        },
+        {
+            "type": "java",
+            "name": "MySignature",
+            "request": "launch",
+            "mainClass": "signature.MySignature",
+            "projectName": "SEGURANCA_DA_INFORMACAO_INF1416_T3_4e1f1084"
+        },
+        {
+            "type": "java",
+            "name": "MySignatureTest",
+            "request": "launch",
+            "mainClass": "signature.MySignatureTest",
+            "projectName": "SEGURANCA_DA_INFORMACAO_INF1416_T3_4e1f1084",
+        }
+    ]
+}
