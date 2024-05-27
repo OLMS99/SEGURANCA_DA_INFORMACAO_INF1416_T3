@@ -29,49 +29,6 @@ public class MySignature {
 
 	private Cipher cifra;
 	private Key holder;
-
-	public static void main(String[] args) {
-		if (args.length != 2) {
-			System.err.println("Usage: java MySignature signatureStandard text");
-			System.exit(1);
-		}
-
-		try {
-			if (Security.getProvider("BC") == null) {
-				java.security.Security.addProvider(new BouncyCastleProvider());
-			}
-		} catch (Exception e) {
-			System.err.println("Erro ao carregar o provider BouncyCastle");
-			System.exit(1);
-		}
-
-		String signatureStandard = args[0];
-		String plainText = args[1];
-
-		MySignature signningProcess = MySignature.getInstance(signatureStandard);
-		KeyPairGenerator keyGen = null;
-		KeyPair chaves = null;
-		try {
-			keyGen = KeyPairGenerator.getInstance(signningProcess.cypherSignature);
-			keyGen.initialize(4096);
-			chaves = keyGen.generateKeyPair();
-		} catch (Exception e) {
-			System.err.println("erro na geração de chaves");
-			System.exit(1);
-		}
-
-		signningProcess.initSign(chaves.getPrivate());
-		signningProcess.update(plainText);
-		byte[] assinatura = signningProcess.sign();
-
-		signningProcess.initVerify(chaves.getPublic());
-		signningProcess.update(plainText);
-		boolean verificationResult = signningProcess.verify(assinatura);
-
-		System.out.println("Assinatura da mensagem: " + MySignature.HexCodeString(assinatura));
-		System.out.println("Verificação da assinatura: " + (verificationResult ? "sucesso" : "falha"));
-	}
-
 	private static class SingletonHelper {
 		private static final MySignature MD5withRSA = new MySignature("MD5", "RSA");
 		private static final MySignature SHA1withRSA = new MySignature("SHA1", "RSA");
@@ -103,28 +60,28 @@ public class MySignature {
 		}
 
 		try {
-			this.digestTipo = MessageDigest.getInstance(this.cypherDigest, "BC");
+			this.digestTipo = MessageDigest.getInstance(this.cypherDigest);//using instance in BouncyCastle provider "BC"
 		} catch (NoSuchAlgorithmException e) {
 			System.err.println(this.cypherDigest + " não é um algoritmo de digest suportado");
 			System.exit(1);
-		} catch (NoSuchProviderException e) {
-			System.err.println("Provider BouncyCastle indisponível na coleta de instancia de calculo de digest");
-			System.exit(1);
-		}
+		}// catch (NoSuchProviderException e) {
+		//	System.err.println("Provider BouncyCastle indisponível na coleta de instancia de calculo de digest");
+		//	System.exit(1);
+		//}
 
 		this.cifra = null;
 		try {
-			this.cifra = Cipher.getInstance(tipoCifra, "BC");
+			this.cifra = Cipher.getInstance(tipoCifra);//using instance in BouncyCastle provider "BC"
 		} catch (NoSuchPaddingException e) {
 			System.err.println(this.cypherDigest + " não é um padding suportado");
 			System.exit(1);
 		} catch (NoSuchAlgorithmException e) {
 			System.err.println(this.cypherDigest + " não é um algoritmo suportado");
 			System.exit(1);
-		} catch (NoSuchProviderException e) {
-			System.err.println("Provider BouncyCastle indisponível na coleta de instancia de cifra");
-			System.exit(1);
-		}
+		} //catch (NoSuchProviderException e) {
+		//	System.err.println("Provider BouncyCastle indisponível na coleta de instancia de cifra");
+		//	System.exit(1);
+		//}
 	}
 
 	public static final MySignature getInstance(String padraoAssinatura) {
