@@ -8,8 +8,12 @@
             "type": "java",
             "name": "MySignature",
             "request": "launch",
-            "mainClass": "signature.MySignature",
-            "projectName": "SEGURANCA_DA_INFORMACAO_INF1416_T3_4e1f1084"
+            "mainClass": "signature.MySignatureTest",
+            "projectName": "SEGURANCA_DA_INFORMACAO_INF1416_T3_4e1f1084",
+            "args": [
+                "SHA512withRSA",
+                "Mensagem_Secreta"
+            ]
         },    
         
         {
